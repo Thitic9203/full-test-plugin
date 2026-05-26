@@ -1,18 +1,20 @@
 # Full-Test Orchestrator
 
-พิมพ์ `/full-test` แค่คำสั่งเดียว — Claude จะทดสอบเว็บให้ครบทุกมิติแล้วเปิดบัคให้อัตโนมัติ
+One command. Full coverage. Real bug reports.
 
-## ทำไมต้องใช้
+Type `/full-test` and Claude will test your entire web app — every route, every role, every viewport — then file evidence-backed bugs directly in GitHub or Jira.
 
-- **ครบจบในคำสั่งเดียว** — ไม่ต้องเขียน test script เอง ไม่ต้องสลับ tool ไม่ต้องจัดการ report
-- **ครอบคลุมทุกมุม** — ทุก route, ทุก role, ทุก module, ทุก viewport (Desktop/Tablet/Mobile), ทุก mode (light/dark)
-- **หาบัคจากโค้ดจริง ไม่มโน** — ทุกบัคต้องมีหลักฐาน: ไฟล์ บรรทัด เหตุผล ถ้าไม่มีหลักฐานจะไม่เปิดบัค
-- **เปิดบัคให้เลย** — ร่าง draft ให้ดูก่อน confirm แล้วก็เปิดใน GitHub Issues หรือ Jira ให้ พร้อม severity, screenshot, steps to reproduce ครบ
-- **ใช้ได้กับเว็บอะไรก็ได้** — ไม่ผูกกับ framework หรือ project ใด วิเคราะห์จาก source code ของ repo ที่ทำงานอยู่
+## Why Use This
+
+- **One command does everything** — no test scripts to write, no tools to switch between, no reports to assemble
+- **Full coverage** — every route, role, module, viewport (Desktop/Tablet/Mobile), and mode (light/dark)
+- **Evidence-based bugs only** — every bug must have a source file, line number, and clear reasoning. No evidence = no bug filed
+- **Files bugs for you** — drafts each bug in chat for your review, then opens issues in GitHub and/or Jira with severity, screenshots, and steps to reproduce
+- **Works with any web app** — framework-agnostic. Analyzes the source code of whatever repo you're working in
 
 ## Installation
 
-**1. ติดตั้ง required skills:**
+**1. Install required skills:**
 
 ```
 /plugin marketplace add anthropics/skills
@@ -25,7 +27,7 @@
 /plugin install fullstack-dev-skills@jeffallan-claude-skills
 ```
 
-**2. ติดตั้ง plugin นี้:**
+**2. Install this plugin:**
 
 ```
 /plugin marketplace add Thitic9203/full-test-plugin
@@ -34,8 +36,8 @@
 
 **3. Restart Claude Code**
 
-> เปิดบัคใน GitHub ต้องมี `gh` CLI (`brew install gh` → `gh auth login`)
-> เปิดบัคใน Jira ต้องมี Atlassian MCP plugin
+> Filing bugs in GitHub requires `gh` CLI (`brew install gh` then `gh auth login`)
+> Filing bugs in Jira requires the Atlassian MCP plugin
 
 ## Usage
 
@@ -43,7 +45,7 @@
 /full-test
 ```
 
-Skill จะถาม URL, test accounts, viewports, test cases แล้วรันเทสให้ทั้งหมด — สรุปบัคเป็นตาราง → ร่าง draft ให้ confirm → เปิด issues ให้
+The skill will ask for your target URL, test accounts, viewports, and test cases — then run all tests automatically, summarize bugs in a table, draft each one for your confirmation, and open issues for you.
 
 ## License
 
