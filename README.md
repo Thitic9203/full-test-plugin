@@ -1,6 +1,14 @@
 # Full-Test Orchestrator
 
-Generic web testing plugin for Claude Code — ทดสอบเว็บครบทุกมิติแล้วเปิดบัคใน GitHub/Jira ให้อัตโนมัติ
+พิมพ์ `/full-test` แค่คำสั่งเดียว — Claude จะทดสอบเว็บให้ครบทุกมิติแล้วเปิดบัคให้อัตโนมัติ
+
+## ทำไมต้องใช้
+
+- **ครบจบในคำสั่งเดียว** — ไม่ต้องเขียน test script เอง ไม่ต้องสลับ tool ไม่ต้องจัดการ report
+- **ครอบคลุมทุกมุม** — ทุก route, ทุก role, ทุก module, ทุก viewport (Desktop/Tablet/Mobile), ทุก mode (light/dark)
+- **หาบัคจากโค้ดจริง ไม่มโน** — ทุกบัคต้องมีหลักฐาน: ไฟล์ บรรทัด เหตุผล ถ้าไม่มีหลักฐานจะไม่เปิดบัค
+- **เปิดบัคให้เลย** — ร่าง draft ให้ดูก่อน confirm แล้วก็เปิดใน GitHub Issues หรือ Jira ให้ พร้อม severity, screenshot, steps to reproduce ครบ
+- **ใช้ได้กับเว็บอะไรก็ได้** — ไม่ผูกกับ framework หรือ project ใด วิเคราะห์จาก source code ของ repo ที่ทำงานอยู่
 
 ## Installation
 
