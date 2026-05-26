@@ -1,0 +1,10 @@
+{
+  "name": "full-test",
+  "version": "1.0.0",
+  "description": "Generic web testing orchestrator — runs 4 testing skills sequentially and reports bugs as GitHub issues",
+  "author": {
+    "name": "Thitichaya"
+  },
+  "license": "MIT",
+  "keywords": ["testing", "webapp", "playwright", "orchestrator", "qa"]
+}
