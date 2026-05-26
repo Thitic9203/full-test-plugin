@@ -108,14 +108,33 @@ Follow these 7 phases strictly in order:
    | Test Cases | (from source above)           | 25    |
    ```
 
-10. **Ask user:**
-    - "Test matrix + test cases ทั้งหมดนี้ถูกต้องไหม?"
+10. **Ask target URL:**
+    - "URL ของเว็บที่จะเทสคืออะไร? (เช่น http://localhost:3000, https://staging.example.com)"
+    - ถ้า user ให้ localhost → ถาม: "Dev server รันอยู่แล้วหรือยัง? ถ้ายังต้องใช้คำสั่งอะไรรัน?"
+    - ถ้า user ให้ remote URL → note ไว้ว่า source code อาจไม่ตรง 100% กับ deployed version
+
+11. **Ask test accounts:**
+    - "มี account สำหรับเทสแต่ละ role ไหม?"
+    - แสดงตาราง roles ที่ discover ได้:
+      ```
+      | Role   | Username/Email | Password | Notes      |
+      |--------|----------------|----------|------------|
+      | admin  | ?              | ?        |            |
+      | user   | ?              | ?        |            |
+      | guest  | (ไม่ต้อง login) | —        |            |
+      ```
+    - "กรุณาระบุ credentials สำหรับแต่ละ role ที่ต้อง login"
+    - ถ้า user ไม่มี account สำหรับ role ใด → ข้าม role นั้น note ไว้ว่า "ไม่ได้ทดสอบ role X เพราะไม่มี account"
+    - **ห้ามเก็บ credentials ลง file หรือ log ใดๆ — ใช้ในเทสระหว่าง session เท่านั้น**
+
+12. **Confirm everything:**
+    - "Test matrix + test cases + URL + accounts ทั้งหมดนี้ถูกต้องไหม?"
     - "ต้องการทดสอบ Viewports ไหนบ้าง? (default: Desktop 1920x1080, Tablet 768x1024, Mobile 375x667)"
     - "เปิด issues ที่ GitHub repo ไหน? (format: owner/repo)"
 
-11. **If discovery finds nothing** for any category → ask user directly instead of guessing.
+13. **If discovery finds nothing** for any category → ask user directly instead of guessing.
 
-**Do NOT proceed until user confirms both test cases AND test matrix.**
+**Do NOT proceed until user confirms test cases, test matrix, URL, AND accounts.**
 
 ---
 
