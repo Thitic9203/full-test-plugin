@@ -22,6 +22,47 @@ Comprehensive web testing orchestrator that runs 4 testing skills in sequence, c
 - **ALWAYS ask user to confirm bugs before opening GitHub issues**
 - **ALWAYS include file path + line number in every bug report**
 - **ALWAYS run skills in order** — do not skip or reorder phases
+- **NEVER say "cannot test because there is no test data"** — if test data is needed, CREATE it yourself (see Test Data Rules below)
+
+## Test Data Rules
+
+**ห้ามหยุดเทสเพราะ "ไม่มีข้อมูลทดสอบ" เด็ดขาด** — ถ้าต้องการข้อมูลเพื่อทดสอบ ให้หาทางสร้างเองให้ได้:
+
+1. **Form / Input testing:** สร้าง test data เองตาม field type:
+   - Email → `test-<timestamp>@example.com`
+   - Phone → `0800000001`
+   - Name → `Test User`, `ทดสอบ ระบบ`
+   - Date → วันนี้, อดีต, อนาคต
+   - Number → 0, 1, -1, boundary values, max
+   - Text → short, long (>255 chars), special chars, emoji, HTML tags
+   - File upload → สร้าง dummy file ด้วย Playwright (small PNG, PDF)
+
+2. **CRUD testing:** ถ้าต้องมี record ในระบบก่อนถึงจะเทสได้:
+   - สร้าง record ใหม่ผ่าน UI ก่อน (create flow) → แล้วค่อยเทส read/update/delete
+   - ถ้ามี API → สร้าง data ผ่าน API ก่อน test
+   - ถ้ามี seed script → รัน seed ก่อน test
+
+3. **Role-based testing:** ถ้า role ไหนไม่มี account:
+   - ถาม user ว่าสร้าง account ใหม่ได้ไหม
+   - ถ้าได้ → สร้างผ่าน signup flow หรือ admin panel
+   - ถ้าไม่ได้ → note ไว้ว่า "ไม่ได้ทดสอบ role X — ต้องการ account จาก admin" แต่ยังทดสอบ role อื่นต่อ ห้ามหยุดทั้งหมด
+
+4. **Empty state testing:** ถ้าหน้าว่างเพราะไม่มีข้อมูล:
+   - นี่คือสิ่งที่ต้องเทส — empty state ต้องแสดงผลถูกต้อง
+   - เทส empty state ก่อน → สร้าง data → เทส populated state
+
+5. **Search / Filter testing:** สร้าง data หลากหลายก่อน แล้วค่อยเทส search/filter
+
+**ลำดับความสำคัญในการหา test data:**
+1. สร้างผ่าน UI ของแอปเอง (ดีที่สุด — เทส create flow ไปด้วย)
+2. สร้างผ่าน API (เร็ว แต่ข้าม UI validation)
+3. รัน seed/fixture script (ถ้ามีใน project)
+4. ถาม user ขอ data / ขอ access — **ถามเฉพาะเมื่อทำเองไม่ได้จริงๆ**
+
+**ห้ามเด็ดขาด:**
+- ห้ามข้ามเทสเคสเพราะ "ไม่มีข้อมูล"
+- ห้ามบอก user ว่า "ไม่สามารถทดสอบได้" โดยไม่ลองหาทางสร้างข้อมูลก่อน
+- ห้ามสมมติว่า data ไม่สำคัญ — ทุกเทสเคสต้องรันด้วย data จริง
 
 ## Workflow
 
