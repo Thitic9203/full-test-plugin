@@ -1,10 +1,11 @@
 {
   "name": "full-test",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "description": "Generic web testing orchestrator — runs 4 testing skills sequentially and reports bugs as GitHub/Jira issues",
   "author": {
     "name": "Thitichaya"
   },
   "license": "MIT",
-  "keywords": ["testing", "webapp", "playwright", "orchestrator", "qa"]
+  "keywords": ["testing", "webapp", "playwright", "orchestrator", "qa"],
+  "skills": ["./skills/web-test-orchestrator"]
 }
