@@ -530,6 +530,136 @@ Report total: "Created X bugs (Y Critical, Z High, W Medium, V Low) — Jira: A 
 
 ---
 
+### Phase 7: Post-Test Actions
+
+**Goal:** Update test results to the destination user specifies, and optionally update Jira tickets.
+
+**สำคัญ: ร่างทุกอย่างใน chat ให้ user confirm ก่อนลงมือทำจริงเสมอ**
+
+---
+
+#### Phase 7A: Ask Where to Record Results
+
+ถาม user:
+- "ต้องการให้อัปเดตผลการทดสอบไว้ที่ไหน?"
+  - **Jira** — comment ผลเทสลง ticket (ระบุ ticket key หรือ filter)
+  - **Google Sheets** — ระบุ URL ของ sheet
+  - **File (CSV/Markdown)** — ระบุ path
+  - **Confluence** — ระบุ page URL
+  - **ไม่ต้อง** — ข้ามไป
+
+ถ้า user เลือก **Google Sheets หรือ File**:
+- "ให้อัปเดตคอลัมน์/ฟิลด์ไหนบ้าง? (เช่น Status, Result, Tester, Date, Notes)"
+- "format ของผลเทสที่ต้องการ? (เช่น PASSED/FAILED, Pass/Fail, ✅/❌)"
+
+---
+
+#### Phase 7B: Draft Result Updates
+
+สร้าง draft สิ่งที่จะอัปเดต แสดงใน chat:
+
+**ถ้า Jira comment:**
+```
+━━━ Ticket PROJ-101 ━━━
+Comment:
+  Test Result: PASSED ✅
+  Tested on: 2026-05-27
+  Viewport: Desktop 1920x1080, Mobile 375x667
+  Notes: All scenarios passed — login, dashboard, CRUD
+━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+**ถ้า Google Sheets / File:**
+```
+━━━ Row updates ━━━
+| Test Case          | Status | Tester | Date       | Notes           |
+|--------------------|--------|--------|------------|-----------------|
+| Login valid creds  | PASSED | Claude | 2026-05-27 | No issues found |
+| Login wrong pass   | PASSED | Claude | 2026-05-27 | Error shown OK  |
+| Dashboard overflow | FAILED | Claude | 2026-05-27 | Bug PROJ-123    |
+━━━━━━━━━━━━━━━━━━━━
+```
+
+**ถ้า Confluence:**
+```
+━━━ Page update ━━━
+Page: [page title]
+Section to add/update: Test Results
+Content: [summary table with pass/fail counts and bug links]
+━━━━━━━━━━━━━━━━━━━
+```
+
+ถาม: "Draft ด้านบนถูกต้องไหม? ต้องแก้อะไรก่อนอัปเดตจริง?"
+
+**ห้ามอัปเดตจริงก่อน user confirm**
+
+---
+
+#### Phase 7C: Jira Ticket Actions (ถ้าเทสตาม Jira tickets)
+
+ถ้า test cases มาจาก Jira tickets → ถามเพิ่ม:
+
+1. "ต้องการให้ปรับสถานะ ticket ด้วยไหม?"
+   - ถ้าใช่ → ใช้ `getTransitionsForJiraIssue` ดู transitions ที่ใช้ได้ แล้วถาม:
+   - "Ticket ที่ PASSED ให้ transition ไปสถานะอะไร? (เช่น Done, Closed, Ready for Release)"
+   - "Ticket ที่ FAILED ให้ transition ไปสถานะอะไร? (เช่น Reopen, In Progress, To Do)"
+
+2. "ต้องการเปลี่ยน assignee ไหม?"
+   - ถ้าใช่ → ถาม: "Assign ให้ใคร? (ระบุ email หรือ username)"
+
+3. "ต้องการเพิ่ม label ไหม?"
+   - ถ้าใช่ → ถาม: "Label อะไร? (เช่น tested, qa-passed, qa-failed, regression-tested)"
+
+4. "มีอย่างอื่นที่ต้องการทำกับ tickets เหล่านี้อีกไหม?"
+
+---
+
+#### Phase 7D: Confirm & Execute
+
+**สรุปทวนทุกอย่างที่จะทำ** ใน chat ก่อนลงมือ:
+
+```
+━━━ สรุปสิ่งที่จะดำเนินการ ━━━
+
+1. อัปเดตผลเทส:
+   - Jira: comment ผลเทสลง 5 tickets (PROJ-101 ~ PROJ-105)
+   - Google Sheets: อัปเดต 10 rows ในคอลัมน์ Status, Date, Notes
+
+2. ปรับ Jira tickets:
+   - PROJ-101, PROJ-102, PROJ-104 (PASSED) → transition เป็น "Done"
+   - PROJ-103, PROJ-105 (FAILED) → transition เป็น "Reopen"
+   - เพิ่ม label "qa-passed" ให้ tickets ที่ PASSED
+   - เพิ่ม label "qa-failed" ให้ tickets ที่ FAILED
+
+3. เปิดบัคใหม่:
+   - 3 issues ใน Jira (PROJ board)
+
+Total actions: 18
+━━━━━━━━━━━━━━━━━━━━━━━━━━━
+```
+
+ถาม: "ทั้งหมดนี้ถูกต้องครบแล้ว — confirm ให้ดำเนินการได้เลยไหม?"
+
+**ห้ามลงมือทำก่อน user confirm รอบสุดท้ายนี้**
+
+เมื่อ user confirm แล้ว → execute ทุก action ตามลำดับ:
+1. อัปเดตผลเทส (Jira comment / Sheets / File / Confluence)
+2. Transition tickets
+3. Update assignee / labels
+4. เปิดบัคใหม่ (ถ้ายังไม่ได้เปิดใน Phase 6)
+
+แสดง progress ระหว่างทำ:
+```
+[1/18] ✅ Comment ผลเทสลง PROJ-101
+[2/18] ✅ Comment ผลเทสลง PROJ-102
+...
+[18/18] ✅ เปิดบัค PROJ-130
+
+Done — 18/18 actions completed.
+```
+
+---
+
 ## Anti-Hallucination Rules
 
 These rules are non-negotiable:
