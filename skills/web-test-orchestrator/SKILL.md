@@ -106,55 +106,43 @@ Follow these phases strictly in order:
 3. Target URL (verified accessible)
 4. Test accounts (or explicit "skip role X" from user)
 
+**กฎ: ถามทีละข้อ รอ user ตอบก่อนถามข้อถัดไป ห้ามถามรวมหลายข้อในข้อความเดียว**
+
 **Steps:**
 
 1. **Find the project root** — look for `package.json`, `next.config.*`, `vite.config.*`, or similar.
 
-2. **Discover Routes/Pages:**
-   - React Router: grep for `<Route`, `path=`, `createBrowserRouter`
-   - Next.js: scan `pages/` or `app/` directory structure
-   - Vue Router: grep for `routes:`, `path:`
-   - SvelteKit: scan `src/routes/`
-   - Generic: grep for URL path patterns in source
+2. **Discover** (ทำเงียบๆ ไม่ต้องถาม user):
+   - **Routes/Pages:** React Router (`<Route`, `path=`), Next.js (`pages/`, `app/`), Vue Router, SvelteKit, generic
+   - **Roles:** grep `RoleGuard`, `ProtectedRoute`, `authRequired`, `role ===`, `isAdmin`, `useAuth`, `permissions`
+   - **Modules/Features:** scan `src/features/`, `src/modules/`, `src/pages/`, sidebar/nav components
+   - **Modes:** grep `darkMode`, `theme`, `colorScheme`, `locale`, `i18n`
 
-3. **Discover Roles:**
-   - grep for: `RoleGuard`, `ProtectedRoute`, `authRequired`, `role ===`, `isAdmin`, `userRole`, `useAuth`, `permissions`, `canAccess`
-   - Check middleware/guard files
-   - Map which roles access which routes
+3. **ถามข้อ 1 — Test Case Source:**
+   "เทสเคสที่ต้องการใช้มาจากไหนครับ?"
+   - Jira (project key / JQL)
+   - Confluence (page URL)
+   - Spreadsheet/CSV (file path)
+   - GitHub Issues (repo + label)
+   - ให้ generate จาก code
+   - ระบุเอง
 
-4. **Discover Modules/Features:**
-   - Scan: `src/features/`, `src/modules/`, `src/pages/`, `src/views/`
-   - Read navigation/sidebar components for menu items
-   - List distinct functional areas
+   **รอ user ตอบก่อน — ห้ามทำอะไรจนกว่าจะได้คำตอบ**
 
-5. **Discover Modes:**
-   - grep for: `darkMode`, `theme`, `colorScheme`, `locale`, `i18n`, `dir=`, `rtl`
-   - Check for theme provider/context
-
-6. **Ask for Test Case Source:**
-
-   "เทสเคสที่ต้องการใช้มาจากไหน?"
-   - **Jira** — project key or filter/JQL
-   - **Confluence** — page URL with test cases
-   - **Spreadsheet/CSV** — file path
-   - **GitHub Issues** — repo + label
-   - **Generate from code** — auto-create from discovered matrix
-   - **Manual** — user types in chat
-
-7. **Fetch & Review Test Cases:**
-
-   Fetch from source, normalize to standard format:
+4. **Fetch & normalize test cases** จากแหล่งที่ user ระบุ → แสดงเป็นตาราง:
    ```
    | # | Module     | Test Case                        | Role  | Priority |
    |---|------------|----------------------------------|-------|----------|
    | 1 | auth       | Login with valid credentials     | user  | High     |
    ```
 
-8. **Confirm Test Cases:**
-   "เทสเคสทั้งหมด X ข้อ ตามตารางด้านบน — ถูกต้องครบไหม? ต้องเพิ่ม/ลด/แก้ข้อไหน?"
-   **Wait for confirmation. Do NOT proceed without it.**
+5. **ถามข้อ 2 — Confirm Test Cases:**
+   "เทสเคสทั้งหมด X ข้อ ตามตารางด้านบน — ถูกต้องครบไหมครับ? ต้องเพิ่ม/ลด/แก้ข้อไหน?"
 
-9. **Present Test Matrix:**
+   **รอ user ตอบก่อน — ห้ามทำอะไรจนกว่าจะได้คำตอบ**
+
+6. **Present Test Matrix + ถามข้อ 3 — Target URL:**
+   แสดง test matrix ที่ discover ได้:
    ```
    | Category   | Found                         | Count |
    |------------|-------------------------------|-------|
@@ -165,29 +153,52 @@ Follow these phases strictly in order:
    | Modes      | light / dark                  | 2     |
    | Test Cases | (from source above)           | 25    |
    ```
+   "URL ของเว็บที่จะเทสคืออะไรครับ? (เช่น http://localhost:3000 หรือ https://staging.example.com)"
+   - ถ้า localhost → ถามต่อ: "Dev server รันอยู่แล้วหรือยัง?"
+   - ถ้า remote URL → note: source code may differ from deployed version
 
-10. **Ask target URL:**
-    "URL ของเว็บที่จะเทสคืออะไร?"
-    - localhost → "Dev server รันอยู่แล้วหรือยัง?"
-    - remote URL → note: source code may differ from deployed version
+   **รอ user ตอบก่อน — ห้ามทำอะไรจนกว่าจะได้คำตอบ**
 
-11. **Ask test accounts:**
+7. **ถามข้อ 4 — Test Accounts:**
+   ```
+   | Role   | Username/Email | Password | Notes      |
+   |--------|----------------|----------|------------|
+   | admin  | ?              | ?        |            |
+   | user   | ?              | ?        |            |
+   | guest  | (ไม่ต้อง login) | —        |            |
+   ```
+   "กรุณาระบุ credentials สำหรับแต่ละ role ที่ต้อง login ครับ"
+   **Do NOT store credentials in any file or log — session-only use.**
+
+   **รอ user ตอบก่อน — ห้ามทำอะไรจนกว่าจะได้คำตอบ**
+
+8. **ถามข้อ 5 — Viewports:**
+   "ต้องการทดสอบ Viewports ไหนบ้างครับ? (default: Desktop 1920x1080, Tablet 768x1024, Mobile 375x667)"
+
+   **รอ user ตอบก่อน — ห้ามทำอะไรจนกว่าจะได้คำตอบ**
+
+9. **ถามข้อ 6 — Bug Report Target:**
+   "เปิด issues ที่ไหนครับ? — **GitHub Issues** (ระบุ owner/repo) หรือ **Jira** (ระบุ project key) หรือ **ทั้งคู่**?"
+
+   **รอ user ตอบก่อน — ห้ามทำอะไรจนกว่าจะได้คำตอบ**
+
+10. **สรุปทวน + Confirm ทุกอย่างก่อนเริ่ม:**
+    แสดงสรุปทุกคำตอบที่ได้มา:
     ```
-    | Role   | Username/Email | Password | Notes      |
-    |--------|----------------|----------|------------|
-    | admin  | ?              | ?        |            |
-    | user   | ?              | ?        |            |
-    | guest  | (no login)     | —        |            |
+    ━━━ สรุปก่อนเริ่มทดสอบ ━━━
+    Test Cases:  25 ข้อ (จาก Jira PROJ)
+    URL:         https://staging.example.com
+    Roles:       admin (a@test.com), user (u@test.com)
+    Viewports:   Desktop, Tablet, Mobile
+    Bug Target:  Jira (PROJ) + GitHub (owner/repo)
+    Mode:        Full (ทุก Phase)
+    ━━━━━━━━━━━━━━━━━━━━━━━━━━━
     ```
-    "กรุณาระบุ credentials สำหรับแต่ละ role ที่ต้อง login"
-    **Do NOT store credentials in any file or log — session-only use.**
+    "ทั้งหมดถูกต้องครบ — confirm เริ่มทดสอบได้เลยไหมครับ?"
 
-12. **Confirm everything:**
-    - "Test matrix + test cases + URL + accounts ถูกต้องครบไหม?"
-    - "Viewports ไหนบ้าง? (default: Desktop 1920x1080, Tablet 768x1024, Mobile 375x667)"
-    - "เปิด issues ที่ไหน? GitHub repo (owner/repo) หรือ Jira?"
+    **รอ user confirm ก่อน — ห้ามเริ่ม Phase 1 จนกว่าจะได้ confirm**
 
-13. **If discovery finds nothing** for any category → ask user directly.
+11. **If discovery finds nothing** for any category → ask user directly.
 
 **Hard Gate Check:** Do you have all 4 required outputs? If not, ask for the missing ones. Do NOT proceed to Phase 1.
 
@@ -378,7 +389,8 @@ Category: [functional | responsive | accessibility | security | edge-case]
    - "เปิดบัคที่ไหน? — **GitHub Issues** หรือ **Jira** หรือ **ทั้งคู่**?"
    - If Jira → ask board URL/project key, issue type, custom fields
    - If GitHub → ask repo (owner/repo)
-   - **Wait for confirmation.**
+
+   **รอ user ตอบก่อน — ห้ามทำอะไรจนกว่าจะได้คำตอบ**
 
 > **Phase 5 Self-Check:** "ทุก Confirmed bug ผ่าน falsification แล้วจริงไหม? Coverage report ซื่อสัตย์ไหม?"
 
@@ -420,11 +432,13 @@ Screenshot: [path if available]
 ━━━━━━━━━━━━━━
 ```
 
-After all drafts: "ร่างบัคทั้งหมด X ตัว — ต้องแก้ไขตัวไหนไหม? หรือ confirm เปิดได้เลย?"
+After all drafts: "ร่างบัคทั้งหมด X ตัว — ต้องแก้ไขตัวไหนไหมครับ? หรือ confirm เปิดได้เลย?"
+
+**แสดง draft ให้ user อนุมัติก่อน — รอจนกว่าจะได้คำตอบ**
 
 **Iteration limit:** If user requests revisions 3 times on the same bug → ask: "ข้อไหนที่ยังไม่ตรง? ช่วยระบุให้ชัดเพื่อจะได้แก้ถูกจุด"
 
-**Do NOT open issues before user confirms.**
+**กฎ: ห้ามเปิดบัคจริงโดยไม่ได้รับอนุมัติจาก user — แสดง draft ก่อนเสมอ**
 
 ---
 
@@ -540,15 +554,39 @@ ISSUE_EOF
    Tested on: [date]
    ```
 
-4. **Pre-post validation:**
-   - Emoji `❌` `✅` are real Unicode — NOT `\\u274c`
-   - No bare ticket keys — wrap in `{{PROJ-123}}`
-   - No Thai particles (ครับ/ค่ะ) — neutral language
-   - Endpoint matches format (v2 = wiki, v3 = ADF)
-   - Screenshots uploaded as attachments BEFORE `!filename.png|width=600!`
+4. **Jira Posting Pipeline** (ลำดับเดียวกับ retest-bug-plugin):
 
-5. **Thai text encoding** (if posting via JXA/JavaScript):
-   - Generate body with real Thai → `JSON.stringify` BEFORE escaping non-ASCII → escape AFTER stringify → save as ASCII → dry-run decode to verify
+   **Step A — Try Atlassian MCP first:**
+   ใช้ `createJiraIssue` MCP tool → ถ้าสำเร็จ → จบ
+
+   **Step B — Fallback: Node.js + JXA + Chrome** (ถ้า MCP return 403 หรือ fail):
+   1. Build issue body ด้วย real Thai text
+   2. `JSON.stringify` body **ก่อน** escape non-ASCII
+   3. Escape non-ASCII **หลัง** stringify:
+      ```javascript
+      const safe = bodyStr.replace(/[^\x00-\x7F]/g, c =>
+        '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')
+      );
+      ```
+   4. Save file as ASCII: `fs.writeFileSync(path, js, 'ascii')`
+   5. Verify: `if (/[^\x00-\x7F]/.test(js)) throw 'STILL HAS NON-ASCII'`
+   6. Execute via JXA: `osascript -l JavaScript <file>`
+
+   **ลำดับสำคัญมาก:** Escape Thai ก่อน stringify = พัง. Thai ตรงๆ ใน JS file = encoding corruption.
+
+5. **Pre-post validation checklist** (ต้องผ่านทุกข้อก่อนโพสต์):
+   - [ ] Emoji `❌` `✅` เป็น real Unicode — ไม่ใช่ `\\u274c` (double backslash = literal text)
+   - [ ] ไม่มี bare ticket keys — wrap ใน `{{PROJ-123}}`
+   - [ ] ไม่มี Thai particles (ครับ/ค่ะ) — ใช้ neutral language
+   - [ ] Endpoint ตรงกับ format (v2 = wiki, v3 = ADF)
+   - [ ] Screenshots uploaded as attachments ก่อน embed `!filename.png|width=600!`
+   - [ ] JS file เป็น ASCII-only (ถ้าใช้ JXA fallback)
+
+6. **Dry-run ก่อนโพสต์** (ถ้าใช้ JXA fallback):
+   - อ่าน JS file กลับมา
+   - Decode `\uXXXX` sequences
+   - Verify: emoji ถูกต้อง, Thai text อ่านได้, ไม่มี ticket keys ที่จะ auto-link
+   - **ถ้า dry-run fail → แก้ template แล้ว re-generate ก่อนโพสต์ — ห้ามโพสต์แล้วค่อยแก้ทีหลัง**
 
 ---
 
@@ -584,9 +622,11 @@ If Sheets/File: ask column mapping + result format (PASSED/FAILED, etc.)
 
 #### Phase 7B: Draft Result Updates
 
+**กฎ: ร่าง draft ทุกอย่างใน chat ให้ user เห็น — ห้าม post โดยไม่ได้รับอนุมัติจาก user**
+
 Show draft in chat:
 
-**Jira comment:**
+**Jira comment (ใช้ format ตรงนี้เท่านั้น):**
 ```
 ━━━ Ticket PROJ-101 ━━━
 Comment:
@@ -607,11 +647,25 @@ Comment:
 
 **Google Sheets rules:** Read sheet first → match existing format exactly (PASSED/FAILED not Pass/Fail, date format, language) → never overwrite without confirmation → confirm column mapping → batch all updates.
 
-"Draft ถูกต้องไหม? ต้องแก้อะไรก่อนอัปเดตจริง?"
+"Draft ด้านบนถูกต้องไหมครับ? ต้องแก้อะไรก่อนอัปเดตจริง?"
+
+**แสดง draft ให้ user อนุมัติก่อน — รอจนกว่าจะได้คำตอบ**
 
 **Iteration limit:** 3 revision rounds → ask "ข้อไหนที่ยังไม่ตรง?" Don't keep tweaking blindly.
 
-**Do NOT update before user confirms.**
+**Jira Comment Posting Pipeline** (ใช้วิธีเดียวกับ Phase 6C):
+
+1. **Try Atlassian MCP first:** `addCommentToJiraIssue` with `contentFormat: markdown`
+2. **Fallback: Node.js + JXA** ถ้า MCP fail (encoding pipeline เหมือน Phase 6C)
+3. **Pre-post validation checklist** ต้องผ่านทุกข้อก่อนโพสต์
+4. **Dry-run** ก่อนโพสต์จริง (ถ้าใช้ JXA)
+5. **ถ้า dry-run fail → แก้แล้ว re-generate ก่อน — ห้ามโพสต์แล้วค่อยแก้**
+
+**Content rules สำหรับ Jira comments:**
+- ห้ามใส่ Thai particles (ครับ/ค่ะ) — ใช้ neutral language
+- ใช้ "Test Result: PASSED ✅" หรือ "Test Result: FAILED ❌" เท่านั้น — ห้ามใช้รูปแบบอื่น
+- Date format: YYYY-MM-DD
+- Full evidence ทุก test case — ห้ามย่อ ห้ามใช้ "same as above"
 
 #### Phase 7C: Jira Ticket Actions
 
@@ -642,7 +696,9 @@ Total: 18 actions
 
 "ทั้งหมดถูกต้องครบ — confirm ได้เลยไหม?"
 
-**Do NOT execute before final confirmation.**
+**รอ user confirm ก่อน — ห้ามลงมือทำก่อนได้ confirm รอบสุดท้ายนี้**
+
+เมื่อ user confirm แล้ว → **ทำต่อเนื่องทันทีทุก action ไม่ต้องถามซ้ำ** (transition + assign + label + comment):
 
 Execute in order, show progress:
 ```
@@ -651,6 +707,8 @@ Execute in order, show progress:
 ...
 [18/18] ✅ Done — 18/18 actions completed.
 ```
+
+**กฎ:** หลัง user confirm ใน Phase 7D แล้ว ทำ transition + assign + label + comment ต่อเนื่องทันที — ไม่ต้องถามอีก
 
 #### Phase 7E: Handoff (Optional)
 
