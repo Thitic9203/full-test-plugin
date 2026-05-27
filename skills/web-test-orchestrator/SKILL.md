@@ -660,6 +660,113 @@ Done — 18/18 actions completed.
 
 ---
 
+## Formatting Rules (Jira & Google Sheets)
+
+Learned from production experience — follow strictly to avoid re-posts and encoding corruption.
+
+### Jira Comment Format
+
+**Step 1: Decide format BEFORE writing — lock in for entire session:**
+
+| Bug Type | API Endpoint | Markup | When to Use |
+|----------|-------------|--------|-------------|
+| **API / Logic bug** | v3 (`addCommentToJiraIssue` with `contentFormat: markdown`) | ADF (JSON) | No screenshots needed |
+| **FE / UI bug** | v2 (`/rest/api/2/issue/<KEY>/comment`) | Wiki Markup | Screenshots must be inline |
+
+**Cannot switch mid-session.** Decide at the start based on whether screenshots are needed.
+
+**Step 2: Use correct markup per format:**
+
+**v2 Wiki Markup (FE bugs with screenshots):**
+```
+*Retest Result: PASSED ✅*
+
+*Tested on:* <YYYY-MM-DD>
+*Viewport:* <viewport>
+*URL:* {{<url>}}
+
+----
+
+||Test Case||Result||Status||
+|<case description>|<result>|✅|
+|<case description>|<result>|❌|
+
+----
+
+*Evidence:*
+!screenshot-filename.png|width=600!
+
+*Notes:* <observations>
+```
+
+**v3 ADF (API bugs, no screenshots):**
+Use `addCommentToJiraIssue` with `contentFormat: markdown` — write in Markdown, Jira converts automatically.
+
+**Step 3: Pre-post validation checklist:**
+
+Before posting ANY Jira comment, verify ALL of these:
+- [ ] Emoji `❌` `✅` are **real Unicode characters** — NOT `\\u274c` (double backslash = literal text)
+- [ ] No bare ticket keys like `PROJ-123` in free text — wrap in `{{PROJ-123}}` (monospace) to prevent auto-linking
+- [ ] No Thai particles (ครับ/ค่ะ) — use neutral language in Jira
+- [ ] Endpoint matches format (v2 = wiki markup, v3 = ADF)
+- [ ] Screenshots uploaded as attachments BEFORE embedding with `!filename.png|width=600!`
+
+### Thai Text Encoding (Critical for Jira)
+
+If posting via JXA/JavaScript to Jira:
+
+1. Generate body with real Thai text first
+2. `JSON.stringify` BEFORE escaping non-ASCII
+3. Escape non-ASCII AFTER stringify:
+   ```javascript
+   const safe = bodyStr.replace(/[^\x00-\x7F]/g, c =>
+     '\\u' + c.charCodeAt(0).toString(16).padStart(4, '0')
+   );
+   ```
+4. Save file as ASCII — verify: `!/[^\x00-\x7F]/.test(content)`
+5. Dry-run: decode `\uXXXX` back and check emoji + Thai render correctly
+
+**Order matters:** Escape Thai BEFORE `JSON.stringify` = broken. Thai directly in JS file = encoding corruption.
+
+### Jira Wiki Markup Quick Reference
+
+| Element | Syntax |
+|---------|--------|
+| Bold | `*text*` |
+| Monospace | `{{text}}` |
+| Line separator | `----` |
+| Table header | `\|\|Header\|\|` |
+| Table cell | `\|cell\|` |
+| Inline image | `!filename.png\|width=600!` |
+| Link | `[label\|url]` |
+| Emoji | Write real characters: `✅` `❌` |
+
+### Google Sheets Formatting
+
+When updating Google Sheets:
+
+1. **Read the sheet first** — check existing column headers, data format, and conventions before writing
+2. **Match existing format exactly:**
+   - If existing rows use `PASSED` / `FAILED` → use same (not `Pass`/`Fail` or `✅`/`❌`)
+   - If dates are `DD/MM/YYYY` → don't write `YYYY-MM-DD`
+   - If cells are Thai → write Thai; if English → write English
+3. **Never overwrite existing data** without user confirmation
+4. **Column mapping:** Always confirm which columns to update before writing — don't assume column positions
+5. **Batch updates:** Collect all row changes, show as a table in chat, confirm with user, then write in one batch
+
+### Common Formatting Mistakes (Don't Do These)
+
+| Mistake | Result | Fix |
+|---------|--------|-----|
+| `\\u274c` (double backslash) | Shows literal `❌` text | Use real `❌` character |
+| Bare `PROJ-123` in text | Jira auto-links to wrong ticket | Wrap: `{{PROJ-123}}` |
+| v2 wiki markup on v3 endpoint | Format breaks | Match endpoint to markup type |
+| Thai directly in JS file | Encoding corruption `±πÅ` | Escape to `\uXXXX` after stringify |
+| Assumed column positions | Overwrites wrong data | Read sheet headers first |
+| Mixed date formats | Inconsistent sheet | Match existing format |
+
+---
+
 ## Anti-Hallucination Rules
 
 These rules are non-negotiable:
