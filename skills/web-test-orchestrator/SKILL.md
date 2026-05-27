@@ -15,15 +15,9 @@ Comprehensive web testing orchestrator that runs 4 testing skills in sequence, c
 - User asks for comprehensive QA / regression testing
 - User wants to find bugs across all roles, modules, platforms
 
-## Supporting Documents
+## Out of Scope
 
-Load these when the relevant phase begins — not all at once:
-
-- [TEST-DATA.md](./TEST-DATA.md) — How to create test data (load at Phase 1 start)
-- [FORMATTING.md](./FORMATTING.md) — Jira/Sheets formatting rules (load at Phase 6-7)
-- [SEVERITY.md](./SEVERITY.md) — Severity criteria & controlled vocabulary (load at Phase 3)
-- [ANTI-HALLUCINATION.md](./ANTI-HALLUCINATION.md) — Evidence rules & falsification protocol (load at Phase 5)
-- [OUT-OF-SCOPE.md](./OUT-OF-SCOPE.md) — What this plugin does NOT do (load if user asks for unsupported testing)
+This plugin does NOT do: performance/load testing, security audit/pen-test, API-only testing (no UI), visual regression (pixel-diff against Figma), full WCAG accessibility audit, CI/CD test automation framework, native mobile app testing. If user asks for any of these, explain the boundary clearly. Exception: obvious security or a11y issues found incidentally during functional testing ARE reported.
 
 ---
 
@@ -46,17 +40,37 @@ After recital, the user can say "skip the recital" for future sessions — but t
 
 1. **No evidence, no issue.** NEVER open a bug report without evidence from real code or measurable errors. If you catch yourself drafting a bug without a file path, console error, or screenshot — STOP and return to testing.
 
-2. **No skipping for data.** NEVER say "cannot test because there is no test data." CREATE the data yourself. See [TEST-DATA.md](./TEST-DATA.md).
+2. **No skipping for data.** NEVER say "cannot test because there is no test data." CREATE the data yourself. See Test Data Rules section below.
 
 3. **No action without confirmation.** NEVER run tests before user confirms the test matrix. NEVER open issues before user approves drafts. NEVER update tickets before user confirms actions.
 
-4. **Disprove before confirm.** NEVER mark a finding as Confirmed without first attempting to disprove it. See falsification protocol in [ANTI-HALLUCINATION.md](./ANTI-HALLUCINATION.md).
+4. **Disprove before confirm.** NEVER mark a finding as Confirmed without first attempting to disprove it. See Falsification Protocol section below.
 
 5. **Code traceability.** ALWAYS include file path + line number in every bug report. ALWAYS include behavioral description alongside code reference (AFK-ready format).
 
 6. **Run in order.** ALWAYS run skills in Phase order. Do not skip or reorder phases.
 
-7. **Use controlled vocabulary.** ALWAYS use exact terms from [SEVERITY.md](./SEVERITY.md). No synonyms.
+7. **Use controlled vocabulary.** ALWAYS use exact terms from Controlled Vocabulary section below. No synonyms.
+
+---
+
+## Test Data Rules
+
+**Constraint: the agent MUST create test data itself. "No test data" is never a valid reason to skip.**
+
+1. **Form / Input testing:** Create data by field type — Email: `test-<timestamp>@example.com`, Phone: `0800000001`, Name: `Test User` / `ทดสอบ ระบบ`, Date: today/past/future, Number: 0/1/-1/boundary/max, Text: short/long(>255)/special chars/emoji/HTML, File: dummy PNG/PDF via Playwright.
+
+2. **CRUD testing:** Create record via UI first (tests create flow too) → then test read/update/delete. If API exists → create via API. If seed script → run seed.
+
+3. **Role-based testing:** No account for a role? Ask user if we can create one. If yes → signup flow or admin panel. If no → note "Role X not tested — need account from admin" but continue testing other roles. Never stop entirely.
+
+4. **Empty state testing:** Empty pages ARE test targets. Test empty state first → create data → test populated state.
+
+5. **Search / Filter testing:** Create diverse data first, then test search/filter.
+
+**Priority order:** UI creation (best) → API → seed script → ask user (last resort).
+
+**Absolute prohibitions:** Never skip test case for "no data." Never tell user "cannot test" without trying to create data first. Never assume data is unimportant.
 
 ---
 
@@ -70,11 +84,9 @@ Not every run needs full ceremony. The user can control depth:
 | **Quick** | `/full-test quick` | Phase 0 → 1 → 5 → 6 | Top 5 flows, desktop only, primary role |
 | **Targeted** | `/full-test module:auth` | All 7 phases | Specified module/route only |
 
-In **Quick** mode: skip Phase 2 (cross-platform) and Phase 3 (strategy). Go straight from Phase 1 recon to Phase 5 consolidation. Still apply all constraints.
+In **Quick** mode: skip Phase 2 (cross-platform) and Phase 3 (strategy). Still apply all constraints.
 
-In **Targeted** mode: full rigor but scoped to the specified area.
-
-If the user's request is ambiguous, ask: "Full test (ทุก route, ทุก role, ทุก viewport) หรือ Quick smoke test (top 5 flows, desktop only)?"
+If ambiguous, ask: "Full test (ทุก route, ทุก role, ทุก viewport) หรือ Quick smoke test (top 5 flows, desktop only)?"
 
 ---
 
@@ -252,8 +264,6 @@ Mode: [light | dark | N/A]
 
 **Invoke:** `fullstack-dev-skills:test-master` skill (Jeffallan)
 
-**Load:** [SEVERITY.md](./SEVERITY.md) for severity criteria and controlled vocabulary.
-
 **Instructions to pass:**
 - Review all findings from Phase 1 and Phase 2
 - Identify gaps:
@@ -262,7 +272,7 @@ Mode: [light | dark | N/A]
   - Form validation (required fields, format validation)
   - Navigation flows (back button, deep linking)
   - State persistence (refresh, tab switching)
-- Assign severity using criteria from SEVERITY.md
+- Assign severity using Severity Criteria below
 - Run additional targeted tests for identified gaps
 - Produce a rated findings report
 
@@ -303,17 +313,14 @@ Category: [functional | responsive | accessibility | security | edge-case]
 
 **Goal:** Merge findings, falsify, deduplicate, assess coverage honestly, get user approval.
 
-**Load:** [ANTI-HALLUCINATION.md](./ANTI-HALLUCINATION.md) for falsification protocol.
-**Load:** [SEVERITY.md](./SEVERITY.md) for controlled vocabulary.
-
 **Steps:**
 
 1. **Merge** all findings from Phase 1-4 into a single list.
 
-2. **Falsify each finding** — before confirming any bug, attempt to disprove it:
+2. **Falsify each finding** (see Falsification Protocol below) — before confirming any bug, attempt to disprove it:
    - "Could this be intentional design?"
    - "Does this behavior match other parts of the app?"
-   - Run at least ONE disproof test per finding (see ANTI-HALLUCINATION.md)
+   - Run at least ONE disproof test per finding
    - Disproof failed → Confirmed
    - Disproof succeeded → Drop
    - Inconclusive → Needs Review
@@ -331,7 +338,7 @@ Category: [functional | responsive | accessibility | security | edge-case]
 5. **Look up source code** for every finding:
    - Find file and line number
    - Quote relevant code
-   - Write behavioral description (AFK-ready — see ANTI-HALLUCINATION.md)
+   - Write behavioral description (AFK-ready — see bug format in Phase 6A)
    - If no code evidence → Needs Review
 
 6. **Honest Coverage Statement** — report what was and was NOT tested:
@@ -381,13 +388,11 @@ Category: [functional | responsive | accessibility | security | edge-case]
 
 **Goal:** Open one bug report per confirmed finding — GitHub Issues, Jira, or both.
 
-**Load:** [FORMATTING.md](./FORMATTING.md) if Jira is selected.
-
 **Important: Draft ALL bugs in chat for user confirmation before opening.**
 
 #### Phase 6A: Draft Bugs in Chat
 
-For each bug, show draft in AFK-ready format:
+For each bug, show draft in AFK-ready format (behavioral description as primary, code ref as supplementary):
 
 ```
 ━━━ Bug #1 ━━━
@@ -486,15 +491,19 @@ ISSUE_EOF
 
 #### Phase 6C: Jira Issues
 
-**Load:** [FORMATTING.md](./FORMATTING.md) — lock format (v2 wiki or v3 ADF) at start.
+1. **Lock format at start — cannot switch mid-session:**
 
-1. **Verify project:** `getVisibleJiraProjects`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`
+   | Bug Type | API Endpoint | Markup |
+   |----------|-------------|--------|
+   | API / Logic bug | v3 (`addCommentToJiraIssue` with `contentFormat: markdown`) | ADF |
+   | FE / UI bug | v2 (`/rest/api/2/issue/<KEY>/comment`) | Wiki Markup |
 
-2. **Create each issue** with `createJiraIssue`:
+2. **Verify project:** `getVisibleJiraProjects`, `getJiraProjectIssueTypesMetadata`, `getJiraIssueTypeMetaWithFields`
+
+3. **Create each issue** with `createJiraIssue`:
    - **Summary:** `[Severity] Module — Behavioral description`
-   - **Priority:** Map from SEVERITY.md
+   - **Priority:** Map severity → Jira (Critical→Highest, High→High, Medium→Medium, Low→Low)
    - **Labels:** `bug`, `module:<name>`, `auto-tested`
-   - **Description** in locked format (v2 wiki or v3 ADF)
 
    **v2 Wiki Markup:**
    ```
@@ -531,6 +540,16 @@ ISSUE_EOF
    Tested on: [date]
    ```
 
+4. **Pre-post validation:**
+   - Emoji `❌` `✅` are real Unicode — NOT `\\u274c`
+   - No bare ticket keys — wrap in `{{PROJ-123}}`
+   - No Thai particles (ครับ/ค่ะ) — neutral language
+   - Endpoint matches format (v2 = wiki, v3 = ADF)
+   - Screenshots uploaded as attachments BEFORE `!filename.png|width=600!`
+
+5. **Thai text encoding** (if posting via JXA/JavaScript):
+   - Generate body with real Thai → `JSON.stringify` BEFORE escaping non-ASCII → escape AFTER stringify → save as ASCII → dry-run decode to verify
+
 ---
 
 #### Phase 6D: Summary
@@ -565,9 +584,7 @@ If Sheets/File: ask column mapping + result format (PASSED/FAILED, etc.)
 
 #### Phase 7B: Draft Result Updates
 
-**Load:** [FORMATTING.md](./FORMATTING.md) for Jira/Sheets formatting.
-
-Show draft in chat. Examples:
+Show draft in chat:
 
 **Jira comment:**
 ```
@@ -587,6 +604,8 @@ Comment:
 | Login valid creds  | PASSED | Claude | [date]     | No issues found |
 | Dashboard overflow | FAILED | Claude | [date]     | Bug PROJ-123    |
 ```
+
+**Google Sheets rules:** Read sheet first → match existing format exactly (PASSED/FAILED not Pass/Fail, date format, language) → never overwrite without confirmation → confirm column mapping → batch all updates.
 
 "Draft ถูกต้องไหม? ต้องแก้อะไรก่อนอัปเดตจริง?"
 
@@ -644,3 +663,85 @@ After all actions complete, offer handoff if relevant:
 If no handoff needed → session complete.
 
 > **Phase 7 Self-Check:** "ทุก action ที่ confirm แล้ว ได้ execute ครบจริงไหม? มี action ไหนที่ fail แล้วไม่ได้ retry?"
+
+---
+
+## Anti-Hallucination Rules
+
+These rules are non-negotiable:
+
+1. **No evidence = no issue.** Cannot point to a specific file, line, or measurable error? Do NOT report it.
+2. **Code reference required.** Every bug must include source file and line.
+3. **Reason required.** Every bug must explain WHY — contradicts spec, differs from other parts of app, console/network error, WCAG violation, CSS/logic conflict, or runtime exception.
+4. **Low confidence = quarantine.** Not sure? → Needs Review table. Never auto-open.
+5. **No duplicates.** Check root cause overlap before opening. Deduplicate aggressively.
+6. **Severity must be justified.** Don't inflate. Cosmetic = Low, not Medium.
+
+## Falsification Protocol
+
+Before confirming any finding as a bug, attempt to disprove it:
+
+**Step 1 — Challenge:** "Could this be intentional?" / "Does this match other parts of the app?" / "Am I comparing against the right expectation?"
+
+**Step 2 — Disproof test** (at least ONE per finding):
+
+| Finding Type | Disproof Method |
+|-------------|----------------|
+| Visual bug | Check other pages — same pattern used intentionally elsewhere? |
+| Console error | Caught/handled upstream? Affects user experience? |
+| Layout break | Deliberate responsive behavior? |
+| Missing element | Conditional by design for this role/state? |
+| Form issue | Validation rules in code match this behavior? |
+
+**Step 3 — Classify:** Disproof failed → Confirmed. Disproof succeeded → Drop. Inconclusive → Needs Review.
+
+**Self-check:** "If the developer who wrote this saw my report, would they agree it's a bug or say it's working as intended?" If likely "working as intended" → Needs Review.
+
+---
+
+## Severity Criteria
+
+| Severity | Criteria |
+|----------|----------|
+| **Critical** | App unusable — crash, data loss, security vulnerability, blank page |
+| **High** | Core feature broken — form submit fails, login broken, nav broken |
+| **Medium** | Secondary feature issue — layout shift, responsive break, poor UX |
+| **Low** | Cosmetic — typo, spacing, minor color, console warning |
+
+**Self-check:** Before assigning, ask: "If I showed this to the product owner, would they agree with this level?"
+
+## Controlled Vocabulary
+
+Use these exact terms. No synonyms. Consistency across all outputs.
+
+**Confidence:** Confirmed / Likely / Needs Review (never: Verified, Validated, Probable, Uncertain, TBD)
+
+**Status:** PASSED / FAILED / BLOCKED / NOT TESTED (never: Pass, Fail, OK, Skip, N/A, Pending)
+
+**Categories:** functional / responsive / accessibility / security / edge-case / performance (never: feature, layout, a11y, vulnerability, corner case)
+
+---
+
+## Jira Wiki Markup Quick Reference
+
+| Element | Syntax |
+|---------|--------|
+| Bold | `*text*` |
+| Monospace | `{{text}}` |
+| Line separator | `----` |
+| Table header | `\|\|Header\|\|` |
+| Table cell | `\|cell\|` |
+| Inline image | `!filename.png\|width=600!` |
+| Link | `[label\|url]` |
+| Emoji | Real characters: `✅` `❌` |
+
+## Common Formatting Mistakes
+
+| Mistake | Fix |
+|---------|-----|
+| `\\u274c` double backslash | Use real `❌` character |
+| Bare `PROJ-123` in text | Wrap: `{{PROJ-123}}` |
+| v2 wiki on v3 endpoint | Match endpoint to markup |
+| Thai directly in JS file | Escape to `\uXXXX` after stringify |
+| Assumed column positions | Read sheet headers first |
+| Mixed date formats | Match existing format |
