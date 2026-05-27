@@ -98,7 +98,7 @@ Follow these phases strictly in order:
 
 ### Phase 0: Discovery
 
-**Goal:** Analyze source code to build a test matrix, then get user confirmation.
+**Goal:** สอบถามความต้องการ, วิเคราะห์ source code, สร้าง test matrix, ได้ user confirmation ก่อนเริ่มทดสอบ
 
 **Hard Gate:** Phase 0 MUST produce all 4 outputs below. If ANY is missing, refuse to start Phase 1:
 1. Confirmed test cases (from user-specified source)
@@ -109,6 +109,21 @@ Follow these phases strictly in order:
 **กฎ: ถามทีละข้อ รอ user ตอบก่อนถามข้อถัดไป ห้ามถามรวมหลายข้อในข้อความเดียว**
 
 **Steps:**
+
+0. **ถามความต้องการก่อน** (ถ้า user พิมพ์ `/full-test` เฉยๆ ไม่ได้ระบุอะไร):
+
+   "ต้องการให้ทดสอบอะไรครับ?"
+   - ทดสอบทิคเกตเฉพาะ (ระบุ ticket key เช่น PROJ-123)
+   - ทดสอบทั้ง module / feature (เช่น auth, dashboard)
+   - ทดสอบทั้ง project ครบทุก route
+   - รีเทสบัคที่เคยเปิดไว้
+
+   **รอ user ตอบก่อน — ห้ามทำอะไรจนกว่าจะได้คำตอบ**
+
+   ถ้า user ระบุ ticket → ไปดึงรายละเอียดจาก Jira/GitHub ก่อน แล้วใช้เป็น scope ของการทดสอบ
+   ถ้า user ระบุ module → scope เฉพาะ module นั้น (Targeted mode)
+   ถ้า user ระบุทั้ง project → Full mode
+   ถ้า user ระบุมาพร้อมกับ `/full-test` (เช่น `/full-test PROJ-123`) → ข้าม step นี้ไปเลย
 
 1. **Find the project root** — look for `package.json`, `next.config.*`, `vite.config.*`, or similar.
 
