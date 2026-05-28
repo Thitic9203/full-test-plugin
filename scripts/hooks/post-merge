@@ -1,0 +1,29 @@
+#!/bin/bash
+# Post-merge hook: rename cache symlink when version changes after git pull
+# ไม่ต้อง copy ไฟล์ — cache เป็น symlink ชี้มาที่ repo อยู่แล้ว
+
+PLUGIN_JSON=".claude-plugin/plugin.json"
+MARKETPLACE_NAME="full-test-dev"
+PLUGIN_NAME="full-test"
+CACHE_BASE="$HOME/.claude/plugins/cache/$MARKETPLACE_NAME/$PLUGIN_NAME"
+
+# Exit silently if cache doesn't exist
+[ -d "$CACHE_BASE" ] || exit 0
+
+# Read new version
+VERSION=$(grep '"version"' "$PLUGIN_JSON" | head -1 | sed 's/.*"\([0-9]*\.[0-9]*\.[0-9]*\)".*/\1/')
+[ -z "$VERSION" ] && exit 0
+
+# If symlink name matches current version → nothing to do
+[ -L "$CACHE_BASE/$VERSION" ] && exit 0
+
+# Rename old symlink → new version
+for OLD_ENTRY in "$CACHE_BASE"/*/; do
+  [ -e "$OLD_ENTRY" ] || continue
+  OLD_VER=$(basename "$OLD_ENTRY")
+  if [ "$OLD_VER" != "$VERSION" ]; then
+    mv "$OLD_ENTRY" "$CACHE_BASE/$VERSION"
+    echo "Cache symlink renamed: $OLD_VER → $VERSION"
+    break
+  fi
+done

@@ -14,7 +14,31 @@ Type `/full-test` and Claude will test your entire web app — every route, ever
 
 ## Installation
 
-**1. Install required skills:**
+### Option A: One-command install (recommended)
+
+```bash
+curl -sL https://raw.githubusercontent.com/Thitic9203/full-test-plugin/main/scripts/install.sh | bash
+```
+
+This clones the repo, symlinks the cache, and enables auto-update hooks.
+After this, `git pull` = plugin updated automatically.
+
+### Option B: Manual clone
+
+```bash
+git clone https://github.com/Thitic9203/full-test-plugin.git ~/.claude/plugins/src/full-test
+cd ~/.claude/plugins/src/full-test
+bash scripts/setup.sh
+```
+
+### Option C: Via Claude Code marketplace
+
+```
+/plugin marketplace add Thitic9203/full-test-plugin
+/plugin install full-test@full-test-dev
+```
+
+### Required skills (install once)
 
 ```
 /plugin marketplace add anthropics/skills
@@ -27,17 +51,18 @@ Type `/full-test` and Claude will test your entire web app — every route, ever
 /plugin install fullstack-dev-skills@jeffallan-claude-skills
 ```
 
-**2. Install this plugin:**
+### Then restart Claude Code
 
+> Filing bugs in GitHub requires `gh` CLI — the plugin will offer to install it for you.
+> Filing bugs in Jira requires the Atlassian MCP plugin — the plugin will detect and fallback to JXA if unavailable.
+
+### Updating
+
+If installed via Option A or B:
+```bash
+cd ~/.claude/plugins/src/full-test && git pull
 ```
-/plugin marketplace add Thitic9203/full-test-plugin
-/plugin install full-test@full-test-dev
-```
-
-**3. Restart Claude Code**
-
-> Filing bugs in GitHub requires `gh` CLI (`brew install gh` then `gh auth login`)
-> Filing bugs in Jira requires the Atlassian MCP plugin
+That's it — cache symlink means the plugin sees new files immediately.
 
 ## Usage
 
